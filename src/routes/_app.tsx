@@ -8,7 +8,7 @@ export const Route = createFileRoute('/_app')({
 function App() {
   return (
     <main>
-      <div>navbar</div>
+      <div className="text-red-500">navbar</div>
       <Outlet />
       <div>footer</div>
     </main>
