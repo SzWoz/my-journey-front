@@ -3,25 +3,55 @@ import React from 'react';
 import { useMapControls } from '@/hooks/useMapControls';
 import Autocomplete from './-components/autocomplete';
 import MapView from './-components/map-view';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export const Route = createFileRoute('/_app/_authenticated/dashboard/')({
   component: DashboardLayout,
 });
 
 function DashboardLayout() {
-  const { locations, addLocation, formattedTotalDistance, setTotalDistance } = useMapControls();
+  const { locations, addLocation, calculateDistanceFromStart, formattedTotalDistance, setTotalDistance } =
+    useMapControls();
 
   return (
-    <section className="grid">
+    <section className="">
       <div>user statistics</div>
-      {formattedTotalDistance && <div>Total Distance: {formattedTotalDistance}</div>}
 
-      <div>map</div>
-      <div>
-        <Autocomplete addLocation={addLocation} />
-      </div>
-      <div className="h-[70vh] w-full">
-        <MapView locations={locations} setTotalDistance={setTotalDistance} />
+      <div className="grid h-[70vh] grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="overflow-hidden rounded-md">
+          <MapView locations={locations} setTotalDistance={setTotalDistance} />
+        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Plan Your Journey</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid">
+              <Autocomplete addLocation={addLocation} />
+
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Location</TableHead>
+                    <TableHead>Distance from start</TableHead>
+                    <TableHead>Assigned user/s</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {locations.map((location, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{location.formattedAddress}</TableCell>
+                      <TableCell>{calculateDistanceFromStart(index)}</TableCell>
+                      <TableCell>None</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              {formattedTotalDistance}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </section>
   );

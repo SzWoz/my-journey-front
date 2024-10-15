@@ -6,7 +6,9 @@ import './index.css';
 import { APIProvider } from '@vis.gl/react-google-maps';
 
 import { routeTree } from './routeTree.gen';
-import { Toaster } from 'sonner';
+// import { Toaster } from 'sonner';
+import { ThemeProvider } from './components/ui/theme-provider';
+import { Toaster } from './components/ui/sonner';
 
 const queryClient = new QueryClient();
 const router = createRouter({
@@ -27,8 +29,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <APIProvider apiKey={API_KEY}>
-        <Toaster />
-        <RouterProvider router={router} />
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          <Toaster richColors theme="dark" />
+          <RouterProvider router={router} />
+        </ThemeProvider>
       </APIProvider>
     </QueryClientProvider>
   </React.StrictMode>,

@@ -30,7 +30,7 @@ function RootComponent() {
   }, [query.isError]);
 
   return (
-    <div>
+    <div className="min-h-screen">
       <p className="bg-red-500">zcxv</p>
       <Outlet />
       <Suspense>

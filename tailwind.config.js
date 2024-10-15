@@ -51,6 +51,9 @@ export default {
           5: 'hsl(var(--chart-5))',
         },
       },
+      backgroundImage: {
+        'gradient-black': 'radial-gradient(circle, #000 0%,  100%)',
+      },
       keyframes: {
         'accordion-down': {
           from: {

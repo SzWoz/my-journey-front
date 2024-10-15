@@ -37,11 +37,9 @@ function Autocomplete({
   }, [places]);
 
   return (
-    <div className="flex w-3/5 flex-col items-center gap-4">
-      <Input className="w-full" ref={inputRef} />
-      <Button variant="secondary" className="w-40" onClick={() => handleLocationSelection()}>
-        Select Location
-      </Button>
+    <div className="flex flex-col items-center gap-4">
+      <Input ref={inputRef} />
+      <Button onClick={() => handleLocationSelection()}>Select Location</Button>
     </div>
   );
 }
