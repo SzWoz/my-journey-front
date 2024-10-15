@@ -7,7 +7,7 @@ export const Route = createFileRoute('/_app')({
 
 function App() {
   return (
-    <main>
+    <main className="bg-gradient-dark-blue">
       <div className="text-red-500">navbar</div>
       <Outlet />
       <div>footer</div>

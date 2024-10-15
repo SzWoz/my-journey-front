@@ -15,3 +15,11 @@ export const RegisterCredientials = z.object({
 });
 
 export type RegisterCredientials = z.infer<typeof RegisterCredientials>;
+
+export const LatLngObject = z.object({
+  formattedAddress: z.string(),
+  lat: z.number(),
+  lng: z.number(),
+});
+
+export type LatLngObject = z.infer<typeof LatLngObject>;
