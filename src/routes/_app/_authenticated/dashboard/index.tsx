@@ -11,8 +11,7 @@ export const Route = createFileRoute('/_app/_authenticated/dashboard/')({
 });
 
 function DashboardLayout() {
-  const { locations, addLocation, calculateDistanceFromStart, formattedTotalDistance, setTotalDistance } =
-    useMapControls();
+  const { locations, addLocation, formattedTotalDistance, setTotalDistance, editLocation } = useMapControls();
 
   return (
     <section className="">
@@ -20,7 +19,7 @@ function DashboardLayout() {
 
       <div className="grid h-[70vh] grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="overflow-hidden rounded-md">
-          <MapView locations={locations} setTotalDistance={setTotalDistance} />
+          <MapView locations={locations} setTotalDistance={setTotalDistance} editLocation={editLocation} />
         </div>
         <Card>
           <CardHeader>
@@ -41,8 +40,8 @@ function DashboardLayout() {
                 <TableBody>
                   {locations.map((location, index) => (
                     <TableRow key={index}>
-                      <TableCell>{location.formattedAddress}</TableCell>
-                      <TableCell>{calculateDistanceFromStart(index)}</TableCell>
+                      <TableCell>{location.data.formattedAddress}</TableCell>
+                      <TableCell>{location?.distance}</TableCell>
                       <TableCell>None</TableCell>
                     </TableRow>
                   ))}

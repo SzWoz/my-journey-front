@@ -1,19 +1,21 @@
-import { LatLngObject } from '@/api/schema';
+import { LocationObject } from '@/api/schema';
 import { Map, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const DEFAULT_POSITION = { lat: 52.2297, lng: 21.0122 } as const;
 
 type MapViewProps = {
-  locations: LatLngObject[];
+  locations: LocationObject[];
   setTotalDistance: (distance: number) => void;
+  editLocation: (index: number, location: LocationObject) => void;
 };
 
-function MapView({ locations, setTotalDistance }: MapViewProps) {
+function MapView({ locations, setTotalDistance, editLocation }: MapViewProps) {
   const map = useMap();
   const routesLibrary = useMapsLibrary('routes');
   const [directionService, setDirectionService] = useState<google.maps.DirectionsService>();
   const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer>();
+  const prevLocationsRef = useRef<LocationObject[]>([]);
 
   useEffect(() => {
     if (!map || !routesLibrary) return;
@@ -28,20 +30,21 @@ function MapView({ locations, setTotalDistance }: MapViewProps) {
     if (!directionService || !directionsRenderer || locations.length < 2) return;
 
     const waypoints = locations.slice(1, locations.length - 1).map(location => ({
-      location,
+      location: location.data,
       stopover: true,
     }));
 
     directionService.route(
       {
-        origin: locations[0],
-        destination: locations[locations.length - 1],
+        origin: locations[0].data,
+        destination: locations[locations.length - 1].data,
         waypoints,
         travelMode: google.maps.TravelMode.DRIVING,
       },
       (response, status) => {
         if (status === 'OK' && response) {
           directionsRenderer.setDirections(response);
+          console.log(response);
 
           const totalDistance = response.routes[0].legs.reduce((total, leg) => {
             if (leg.distance) {
@@ -49,6 +52,24 @@ function MapView({ locations, setTotalDistance }: MapViewProps) {
             }
             return total;
           }, 0);
+
+          const newLocations = [...locations];
+          response.routes[0].legs.forEach((leg, index) => {
+            if (index === 0) return;
+            const distance = leg.distance?.value || 0;
+            newLocations[index - 1] = {
+              ...newLocations[index - 1],
+              distance,
+            };
+          });
+
+          // Only update locations if they have changed
+          if (JSON.stringify(newLocations) !== JSON.stringify(prevLocationsRef.current)) {
+            newLocations.forEach((location, index) => {
+              editLocation(index, location);
+            });
+            prevLocationsRef.current = newLocations;
+          }
 
           setTotalDistance(totalDistance);
         } else {
@@ -144,7 +165,7 @@ function MapView({ locations, setTotalDistance }: MapViewProps) {
       styles={styles}
       className="size-full"
       defaultZoom={9}
-      defaultCenter={locations[0] || DEFAULT_POSITION}
+      defaultCenter={locations[0]?.data || DEFAULT_POSITION}
       disableDefaultUI
     />
   );
