@@ -1,10 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { useMapControls } from '@/hooks/useMapControls';
 import Autocomplete from './-components/autocomplete';
 import MapView from './-components/map-view';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { TableCell, TableRow } from '@/components/ui/table';
+import { CreatePassangers } from './-components/passangers';
+import { Passanger } from '@/api/schema';
+import GenericTable from '@/components/generic-table';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export const Route = createFileRoute('/_app/_authenticated/dashboard/')({
   component: DashboardLayout,
@@ -13,12 +17,20 @@ export const Route = createFileRoute('/_app/_authenticated/dashboard/')({
 function DashboardLayout() {
   const { locations, addLocation, formattedTotalDistance, setTotalDistance, editLocation } = useMapControls();
 
+  const [passangers, setPassangers] = useState<Passanger[]>([]);
+
+  const handlePassangerInput = (newPassanger: Passanger) => {
+    setPassangers(prev => [...prev, newPassanger]);
+  };
+
+  console.log({ locations });
+
   return (
     <section className="">
       <div>user statistics</div>
 
-      <div className="grid h-[70vh] grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="overflow-hidden rounded-md">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="col-span-2 row-span-1 overflow-hidden rounded-md">
           <MapView locations={locations} setTotalDistance={setTotalDistance} editLocation={editLocation} />
         </div>
         <Card>
@@ -29,26 +41,51 @@ function DashboardLayout() {
             <div className="grid">
               <Autocomplete addLocation={addLocation} />
 
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Location</TableHead>
-                    <TableHead>Distance from start</TableHead>
-                    <TableHead>Assigned user/s</TableHead>
+              <GenericTable headers={['Location', 'Distance from start', 'Assigned user']}>
+                {locations.map((location, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{location.data.formattedAddress}</TableCell>
+                    <TableCell>{location.distance}</TableCell>
+                    <TableCell>
+                      <Select
+                        value={location.assignedUserId ?? ''}
+                        onValueChange={id => editLocation(index, { ...location, assignedUserId: id })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Assign user">
+                            {location.assignedUserId
+                              ? passangers.find(passanger => passanger.id === location.assignedUserId)?.name
+                              : null}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            Users
+                            {passangers.map(passanger => (
+                              <SelectItem key={passanger.id} value={passanger.id}>
+                                {passanger.name}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {locations.map((location, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{location.data.formattedAddress}</TableCell>
-                      <TableCell>{location?.distance}</TableCell>
-                      <TableCell>None</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                ))}
+              </GenericTable>
               {formattedTotalDistance}
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Add passangers</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CreatePassangers setPassangers={newPassanger => handlePassangerInput(newPassanger)} />
+
+            <GenericTable data={passangers} headers={['Name']} dataAccessors={['name']} />
           </CardContent>
         </Card>
       </div>

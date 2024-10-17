@@ -10,6 +10,21 @@ type MapViewProps = {
   editLocation: (index: number, location: LocationObject) => void;
 };
 
+const mockResponse = {
+  routes: [
+    {
+      legs: [
+        {
+          distance: { value: 10000 }, // 10 km
+        },
+        {
+          distance: { value: 20000 }, // 20 km
+        },
+      ],
+    },
+  ],
+};
+
 function MapView({ locations, setTotalDistance, editLocation }: MapViewProps) {
   const map = useMap();
   const routesLibrary = useMapsLibrary('routes');
@@ -34,6 +49,45 @@ function MapView({ locations, setTotalDistance, editLocation }: MapViewProps) {
       stopover: true,
     }));
 
+    // Mocking the response instead of calling the actual API
+    const response = mockResponse;
+    const status = 'OK';
+
+    if (status === 'OK' && response) {
+      directionsRenderer.setDirections(response as any); // Cast to any to avoid type errors
+
+      const totalDistance = response.routes[0].legs.reduce((total, leg) => {
+        if (leg.distance) {
+          return total + leg.distance.value;
+        }
+        return total;
+      }, 0);
+
+      const newLocations = [...locations];
+      response.routes[0].legs.forEach((leg, index) => {
+        if (index === 0) return;
+        const distance = leg.distance?.value || 0;
+        newLocations[index - 1] = {
+          ...newLocations[index - 1],
+          distance,
+        };
+      });
+
+      // Only update locations if they have changed
+      if (JSON.stringify(newLocations) !== JSON.stringify(prevLocationsRef.current)) {
+        newLocations.forEach((location, index) => {
+          editLocation(index, location);
+        });
+        prevLocationsRef.current = newLocations;
+      }
+
+      setTotalDistance(totalDistance);
+    } else {
+      console.error('Directions request failed due to ' + status);
+    }
+
+    // Production code commented out
+    /*
     directionService.route(
       {
         origin: locations[0].data,
@@ -77,6 +131,7 @@ function MapView({ locations, setTotalDistance, editLocation }: MapViewProps) {
         }
       },
     );
+    */
   }, [directionService, directionsRenderer, locations]);
 
   const styles = [

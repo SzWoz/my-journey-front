@@ -20,9 +20,5 @@ function ErrorComponent() {
 }
 
 function Layout() {
-  return (
-    <div>
-      <Outlet />
-    </div>
-  );
+  return <Outlet />;
 }
