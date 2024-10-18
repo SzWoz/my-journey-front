@@ -1,45 +1,77 @@
 import React, { useMemo } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { TableHead, TableRow } from '../ui/table';
+import { AnimatePresence, motion } from 'framer-motion';
 
-type GenericTableProps<T> =
-  | {
-      headers: string[];
-      data: T[];
-      dataAccessors: (keyof T)[];
-      children?: undefined;
-    }
-  | {
-      headers: string[];
-      data?: undefined;
-      dataAccessors?: undefined;
-      children: React.ReactNode;
-    };
+type GenericTableProps<T> = {
+  headers: string[];
+  data: T[];
+  dataAccessors: (keyof T)[];
+  children?: React.ReactNode;
+  renderHeader?: (header: string, index: number) => React.ReactNode;
+  renderCell?: (item: T, accessor: keyof T, rowIndex: number, cellIndex: number) => React.ReactNode;
+};
 
-function GenericTable<T>({ headers, data, dataAccessors, children }: GenericTableProps<T>) {
+const tableRowVariants = {
+  hidden: { opacity: 0, y: -10 },
+  visible: { opacity: 1, y: 0 },
+};
+
+function GenericTable<T>({ headers, data, dataAccessors, renderHeader, renderCell, children }: GenericTableProps<T>) {
   const tableBody = useMemo(() => {
     if (children) return children;
     if (!data || !dataAccessors) return null;
 
+    if (data.length === 0) {
+      return (
+        <motion.div
+          initial={{ x: 100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          variants={tableRowVariants}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="p-4 text-center text-2xl text-gray-600"
+        >
+          No data
+        </motion.div>
+      );
+    }
+
     return data.map((item, rowIndex) => (
-      <TableRow key={rowIndex}>
+      <motion.tr
+        key={rowIndex}
+        initial={{ x: 100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        variants={tableRowVariants}
+        transition={{ duration: 0.5, delay: rowIndex * 0.1 }}
+        className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+      >
         {dataAccessors.map((accessor, cellIndex) => (
-          <TableCell key={cellIndex}>{String(item[accessor])}</TableCell>
+          <motion.td
+            className="p-4 align-middle [&:has([role=checkbox])]:pr-0"
+            key={cellIndex}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            {renderCell ? renderCell(item, accessor, rowIndex, cellIndex) : String(item[accessor])}
+          </motion.td>
         ))}
-      </TableRow>
+      </motion.tr>
     ));
   }, [children, data, dataAccessors]);
 
   return (
-    <Table>
-      <TableHeader>
+    <table className="w-full">
+      <thead>
         <TableRow>
           {headers.map((header, index) => (
-            <TableHead key={index}>{header}</TableHead>
+            <TableHead key={index}>{renderHeader ? renderHeader(header, index) : header}</TableHead>
           ))}
         </TableRow>
-      </TableHeader>
-      <TableBody>{tableBody}</TableBody>
-    </Table>
+      </thead>
+      <tbody>
+        <AnimatePresence>{tableBody}</AnimatePresence>
+      </tbody>
+    </table>
   );
 }
 

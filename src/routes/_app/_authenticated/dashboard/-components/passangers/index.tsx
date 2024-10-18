@@ -11,19 +11,23 @@ export function CreatePassangers({ setPassangers }: CreatePassangersProps) {
   const [passangerName, setPassangerName] = useState<string>('');
 
   const handlePassangerInput = () => {
+    if (passangerName === '') return;
     const newPassanger = {
       name: passangerName,
       id: uuidv4(),
     };
 
     setPassangers(newPassanger);
+    setPassangerName('');
   };
 
   return (
-    <div>
+    <div className="flex flex-col items-center gap-4">
       <Input value={passangerName} onChange={e => setPassangerName(e.target.value)} />
 
-      <Button onClick={() => handlePassangerInput()}>Add Passanger</Button>
+      <Button className="w-fit" onClick={() => handlePassangerInput()}>
+        Add Passanger
+      </Button>
     </div>
   );
 }

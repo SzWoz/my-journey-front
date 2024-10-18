@@ -4,7 +4,6 @@ import { useMapControls } from '@/hooks/useMapControls';
 import Autocomplete from './-components/autocomplete';
 import MapView from './-components/map-view';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TableCell, TableRow } from '@/components/ui/table';
 import { CreatePassangers } from './-components/passangers';
 import { Passanger } from '@/api/schema';
 import GenericTable from '@/components/generic-table';
@@ -15,7 +14,8 @@ export const Route = createFileRoute('/_app/_authenticated/dashboard/')({
 });
 
 function DashboardLayout() {
-  const { locations, addLocation, formattedTotalDistance, setTotalDistance, editLocation } = useMapControls();
+  const { locations, addLocation, formattedTotalDistance, setTotalDistance, editLocation, assignUser } =
+    useMapControls();
 
   const [passangers, setPassangers] = useState<Passanger[]>([]);
 
@@ -23,7 +23,11 @@ function DashboardLayout() {
     setPassangers(prev => [...prev, newPassanger]);
   };
 
-  console.log({ locations });
+  const processedLocations = locations.map(location => ({
+    formattedAddress: location.data.formattedAddress,
+    distance: location.distance ?? 0,
+    assignedUserId: location.assignedUserId,
+  }));
 
   return (
     <section className="">
@@ -33,7 +37,7 @@ function DashboardLayout() {
         <div className="col-span-2 row-span-1 overflow-hidden rounded-md">
           <MapView locations={locations} setTotalDistance={setTotalDistance} editLocation={editLocation} />
         </div>
-        <Card>
+        <Card className="max-h-[500px] overflow-auto">
           <CardHeader>
             <CardTitle>Plan Your Journey</CardTitle>
           </CardHeader>
@@ -41,20 +45,18 @@ function DashboardLayout() {
             <div className="grid">
               <Autocomplete addLocation={addLocation} />
 
-              <GenericTable headers={['Location', 'Distance from start', 'Assigned user']}>
-                {locations.map((location, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{location.data.formattedAddress}</TableCell>
-                    <TableCell>{location.distance}</TableCell>
-                    <TableCell>
-                      <Select
-                        value={location.assignedUserId ?? ''}
-                        onValueChange={id => editLocation(index, { ...location, assignedUserId: id })}
-                      >
+              <GenericTable
+                headers={['Location', 'Distance from start', 'Assigned user']}
+                data={processedLocations}
+                dataAccessors={['formattedAddress', 'distance', 'assignedUserId']}
+                renderCell={(item, accessor, rowIndex) => {
+                  if (accessor === 'assignedUserId') {
+                    return (
+                      <Select value={item.assignedUserId ?? ''} onValueChange={id => assignUser(rowIndex, id)}>
                         <SelectTrigger>
                           <SelectValue placeholder="Assign user">
-                            {location.assignedUserId
-                              ? passangers.find(passanger => passanger.id === location.assignedUserId)?.name
+                            {item.assignedUserId
+                              ? passangers.find(passanger => passanger.id === item.assignedUserId)?.name
                               : null}
                           </SelectValue>
                         </SelectTrigger>
@@ -69,16 +71,17 @@ function DashboardLayout() {
                           </SelectGroup>
                         </SelectContent>
                       </Select>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </GenericTable>
+                    );
+                  }
+                  return String(item[accessor]);
+                }}
+              />
               {formattedTotalDistance}
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="max-h-[500px] overflow-auto">
           <CardHeader>
             <CardTitle>Add passangers</CardTitle>
           </CardHeader>

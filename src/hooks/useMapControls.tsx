@@ -45,5 +45,13 @@ export function useMapControls() {
     });
   }, []);
 
-  return { locations, addLocation, formattedTotalDistance, setTotalDistance, editLocation };
+  const assignUser = useCallback((index: number, userId: string) => {
+    setLocations(prevLocations => {
+      const newLocations = [...prevLocations];
+      newLocations[index].assignedUserId = userId;
+      return newLocations;
+    });
+  }, []);
+
+  return { locations, addLocation, formattedTotalDistance, setTotalDistance, editLocation, assignUser };
 }
