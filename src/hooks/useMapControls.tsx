@@ -1,27 +1,31 @@
-import { LocationObject } from '@/api/schema';
+import { LocationObject, Passanger } from '@/api/schema';
 import { useCallback, useMemo, useState } from 'react';
 
 const MOCKED_LOCATIONS: LocationObject[] = [
   {
     data: {
-      formattedAddress: 'Location 1',
-      lat: 51.5074,
-      lng: 0.1278,
+      lat: 50.2936331,
+      lng: 18.7381664,
+      formattedAddress: 'Bracka 9, 44-103 Gliwice, Polska',
     },
+    distance: 23367,
+    assignedUsers: [],
   },
   {
     data: {
-      formattedAddress: 'Location 2',
-      lat: 51.5074,
-      lng: 0.1278,
+      lat: 50.29386019999999,
+      lng: 18.6650001,
+      formattedAddress: 'Rynek 6, 44-100 Gliwice, Polska',
     },
+    assignedUsers: [],
   },
   {
     data: {
-      formattedAddress: 'Location 3',
-      lat: 51.5074,
-      lng: 0.1278,
+      lat: 50.2794001,
+      lng: 18.95634,
+      formattedAddress: 'Sportowa 29, 41-506 Chorzów, Polska',
     },
+    assignedUsers: [],
   },
 ];
 
@@ -45,13 +49,13 @@ export function useMapControls() {
     });
   }, []);
 
-  const assignUser = useCallback((index: number, userId: string) => {
+  const assignUsers = useCallback((index: number, users: Passanger[]) => {
     setLocations(prevLocations => {
       const newLocations = [...prevLocations];
-      newLocations[index].assignedUserId = userId;
+      newLocations[index].assignedUsers = users;
       return newLocations;
     });
   }, []);
 
-  return { locations, addLocation, formattedTotalDistance, setTotalDistance, editLocation, assignUser };
+  return { locations, addLocation, formattedTotalDistance, setTotalDistance, editLocation, assignUsers };
 }

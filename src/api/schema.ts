@@ -26,7 +26,7 @@ export const LatLngObject = z.object({
 export const LocationObject = z.object({
   data: LatLngObject,
   distance: z.number().optional(),
-  assignedUserId: z.string().optional(),
+  assignedUsers: z.array(Passanger).optional(),
 });
 
 export type LoginCredientials = z.infer<typeof LoginCredientials>;

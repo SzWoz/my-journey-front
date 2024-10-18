@@ -1,6 +1,6 @@
 import { LocationObject } from '@/api/schema';
 import { Map, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const DEFAULT_POSITION = { lat: 52.2297, lng: 21.0122 } as const;
 
@@ -30,7 +30,6 @@ function MapView({ locations, setTotalDistance, editLocation }: MapViewProps) {
   const routesLibrary = useMapsLibrary('routes');
   const [directionService, setDirectionService] = useState<google.maps.DirectionsService>();
   const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer>();
-  const prevLocationsRef = useRef<LocationObject[]>([]);
 
   useEffect(() => {
     if (!map || !routesLibrary) return;
@@ -63,76 +62,59 @@ function MapView({ locations, setTotalDistance, editLocation }: MapViewProps) {
         return total;
       }, 0);
 
-      const newLocations = [...locations];
-      response.routes[0].legs.forEach((leg, index) => {
-        if (index === 0) return;
-        const distance = leg.distance?.value || 0;
-        newLocations[index - 1] = {
-          ...newLocations[index - 1],
-          distance,
-        };
-      });
-
-      // Only update locations if they have changed
-      if (JSON.stringify(newLocations) !== JSON.stringify(prevLocationsRef.current)) {
-        newLocations.forEach((location, index) => {
-          editLocation(index, location);
-        });
-        prevLocationsRef.current = newLocations;
-      }
-
       setTotalDistance(totalDistance);
     } else {
       console.error('Directions request failed due to ' + status);
     }
 
     // Production code commented out
-    /*
-    directionService.route(
-      {
-        origin: locations[0].data,
-        destination: locations[locations.length - 1].data,
-        waypoints,
-        travelMode: google.maps.TravelMode.DRIVING,
-      },
-      (response, status) => {
-        if (status === 'OK' && response) {
-          directionsRenderer.setDirections(response);
-          console.log(response);
 
-          const totalDistance = response.routes[0].legs.reduce((total, leg) => {
-            if (leg.distance) {
-              return total + leg.distance.value;
-            }
-            return total;
-          }, 0);
+    // directionService.route(
+    //   {
+    //     origin: locations[0].data,
+    //     destination: locations[locations.length - 1].data,
+    //     waypoints,
+    //     travelMode: google.maps.TravelMode.DRIVING,
+    //   },
+    //   (response, status) => {
+    //     if (status === 'OK' && response) {
+    //       directionsRenderer.setDirections(response);
+    //       console.log(response);
 
-          const newLocations = [...locations];
-          response.routes[0].legs.forEach((leg, index) => {
-            if (index === 0) return;
-            const distance = leg.distance?.value || 0;
-            newLocations[index - 1] = {
-              ...newLocations[index - 1],
-              distance,
-            };
-          });
+    //       const totalDistance = response.routes[0].legs.reduce((total, leg) => {
+    //         if (leg.distance) {
+    //           return total + leg.distance.value;
+    //         }
+    //         return total;
+    //       }, 0);
 
-          // Only update locations if they have changed
-          if (JSON.stringify(newLocations) !== JSON.stringify(prevLocationsRef.current)) {
-            newLocations.forEach((location, index) => {
-              editLocation(index, location);
-            });
-            prevLocationsRef.current = newLocations;
-          }
+    //       const newLocations = [...locations];
+    //       response.routes[0].legs.forEach(leg => {
+    //         const location = locations.find(l => l.data.formattedAddress === leg.end_address);
+    //         const distance = leg.distance?.value || 0;
+    //         if (location) {
+    //           newLocations{
+    //             ...location,
+    //             distance,
+    //           };
+    //         }
+    //       });
 
-          setTotalDistance(totalDistance);
-        } else {
-          console.error('Directions request failed due to ' + status);
-        }
-      },
-    );
-    */
-  }, [directionService, directionsRenderer, locations]);
+    //       // Only update locations if they have changed
+    //       if (JSON.stringify(newLocations) !== JSON.stringify(prevLocationsRef.current)) {
+    //         newLocations.forEach((location, index) => {
+    //           editLocation(index, location);
+    //         });
+    //         prevLocationsRef.current = newLocations;
+    //       }
+
+    //       setTotalDistance(totalDistance);
+    //     } else {
+    //       console.error('Directions request failed due to ' + status);
+    //     }
+    //   },
+    // );
+  }, [directionService, directionsRenderer, locations.length]);
 
   const styles = [
     { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
