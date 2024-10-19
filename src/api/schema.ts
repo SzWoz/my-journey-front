@@ -29,8 +29,14 @@ export const LocationObject = z.object({
   assignedUsers: z.array(Passanger).optional(),
 });
 
+export const Vehicle = z.object({
+  id: z.string(),
+  name: z.string(),
+});
+
 export type LoginCredientials = z.infer<typeof LoginCredientials>;
 export type RegisterCredientials = z.infer<typeof RegisterCredientials>;
 export type LatLngObject = z.infer<typeof LatLngObject>;
 export type LocationObject = z.infer<typeof LocationObject>;
 export type Passanger = z.infer<typeof Passanger>;
+export type Vehicle = z.infer<typeof Vehicle>;

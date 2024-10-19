@@ -7,10 +7,18 @@ export const Route = createFileRoute('/_app')({
 
 function App() {
   return (
-    <main className="bg-gradient-black p-8">
+    <main className="bg-gradient-black">
       <div className="text-red-500">navbar</div>
-      <Outlet />
-      <div>footer</div>
+
+      <div className="p-8">
+        <Outlet />
+      </div>
+      <footer>
+        Loading animation source:
+        <a href="https://www.flaticon.com/free-animated-icons/transportation" title="transportation animated icons">
+          Transportation animated icons created by Freepik - Flaticon
+        </a>
+      </footer>
     </main>
   );
 }

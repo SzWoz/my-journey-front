@@ -62,6 +62,18 @@ function MapView({ locations, setTotalDistance, editLocation }: MapViewProps) {
         return total;
       }, 0);
 
+      const locationsWithDistance = locations.map((location, index) => {
+        if (index === 0) {
+          return { ...location, distance: undefined }; // Starting location has no distance
+        }
+        const distance = response.routes[0].legs[index - 1]?.distance?.value || 0;
+        return { ...location, distance };
+      });
+
+      locationsWithDistance.forEach((location, index) => {
+        editLocation(index, location);
+      });
+
       setTotalDistance(totalDistance);
     } else {
       console.error('Directions request failed due to ' + status);

@@ -23,15 +23,15 @@ function GenericTable<T>({ headers, data, dataAccessors, renderHeader, renderCel
 
     if (data.length === 0) {
       return (
-        <motion.div
+        <motion.tr
           initial={{ x: 100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           variants={tableRowVariants}
           transition={{ duration: 0.5, delay: 0.1 }}
           className="p-4 text-center text-2xl text-gray-600"
         >
-          No data
-        </motion.div>
+          <motion.td colSpan={dataAccessors.length}>No data</motion.td>
+        </motion.tr>
       );
     }
 
