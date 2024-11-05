@@ -20,6 +20,7 @@ import { Route as AuthAuthRegisterImport } from './routes/auth/_auth.register'
 import { Route as AuthAuthLogoutImport } from './routes/auth/_auth.logout'
 import { Route as AuthAuthLoginImport } from './routes/auth/_auth.login'
 import { Route as AppAuthenticatedDashboardIndexImport } from './routes/_app/_authenticated/dashboard/index'
+import { Route as AppAuthenticatedUserSettingsIndexImport } from './routes/_app/_authenticated/user/settings/index'
 
 // Create Virtual Routes
 
@@ -65,6 +66,12 @@ const AuthAuthLoginRoute = AuthAuthLoginImport.update({
 const AppAuthenticatedDashboardIndexRoute =
   AppAuthenticatedDashboardIndexImport.update({
     path: '/dashboard/',
+    getParentRoute: () => AppAuthenticatedRoute,
+  } as any)
+
+const AppAuthenticatedUserSettingsIndexRoute =
+  AppAuthenticatedUserSettingsIndexImport.update({
+    path: '/user/settings/',
     getParentRoute: () => AppAuthenticatedRoute,
   } as any)
 
@@ -128,6 +135,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuthenticatedDashboardIndexImport
       parentRoute: typeof AppAuthenticatedImport
     }
+    '/_app/_authenticated/user/settings/': {
+      id: '/_app/_authenticated/user/settings/'
+      path: '/user/settings'
+      fullPath: '/user/settings'
+      preLoaderRoute: typeof AppAuthenticatedUserSettingsIndexImport
+      parentRoute: typeof AppAuthenticatedImport
+    }
   }
 }
 
@@ -135,10 +149,13 @@ declare module '@tanstack/react-router' {
 
 interface AppAuthenticatedRouteChildren {
   AppAuthenticatedDashboardIndexRoute: typeof AppAuthenticatedDashboardIndexRoute
+  AppAuthenticatedUserSettingsIndexRoute: typeof AppAuthenticatedUserSettingsIndexRoute
 }
 
 const AppAuthenticatedRouteChildren: AppAuthenticatedRouteChildren = {
   AppAuthenticatedDashboardIndexRoute: AppAuthenticatedDashboardIndexRoute,
+  AppAuthenticatedUserSettingsIndexRoute:
+    AppAuthenticatedUserSettingsIndexRoute,
 }
 
 const AppAuthenticatedRouteWithChildren =
@@ -187,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/auth/logout': typeof AuthAuthLogoutRoute
   '/auth/register': typeof AuthAuthRegisterRoute
   '/dashboard': typeof AppAuthenticatedDashboardIndexRoute
+  '/user/settings': typeof AppAuthenticatedUserSettingsIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -196,6 +214,7 @@ export interface FileRoutesByTo {
   '/auth/logout': typeof AuthAuthLogoutRoute
   '/auth/register': typeof AuthAuthRegisterRoute
   '/dashboard': typeof AppAuthenticatedDashboardIndexRoute
+  '/user/settings': typeof AppAuthenticatedUserSettingsIndexRoute
 }
 
 export interface FileRoutesById {
@@ -208,6 +227,7 @@ export interface FileRoutesById {
   '/auth/_auth/logout': typeof AuthAuthLogoutRoute
   '/auth/_auth/register': typeof AuthAuthRegisterRoute
   '/_app/_authenticated/dashboard/': typeof AppAuthenticatedDashboardIndexRoute
+  '/_app/_authenticated/user/settings/': typeof AppAuthenticatedUserSettingsIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -219,6 +239,7 @@ export interface FileRouteTypes {
     | '/auth/logout'
     | '/auth/register'
     | '/dashboard'
+    | '/user/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | ''
@@ -227,6 +248,7 @@ export interface FileRouteTypes {
     | '/auth/logout'
     | '/auth/register'
     | '/dashboard'
+    | '/user/settings'
   id:
     | '__root__'
     | '/_app'
@@ -237,6 +259,7 @@ export interface FileRouteTypes {
     | '/auth/_auth/logout'
     | '/auth/_auth/register'
     | '/_app/_authenticated/dashboard/'
+    | '/_app/_authenticated/user/settings/'
   fileRoutesById: FileRoutesById
 }
 
@@ -276,7 +299,8 @@ export const routeTree = rootRoute
       "filePath": "_app/_authenticated.tsx",
       "parent": "/_app",
       "children": [
-        "/_app/_authenticated/dashboard/"
+        "/_app/_authenticated/dashboard/",
+        "/_app/_authenticated/user/settings/"
       ]
     },
     "/auth": {
@@ -308,6 +332,10 @@ export const routeTree = rootRoute
     },
     "/_app/_authenticated/dashboard/": {
       "filePath": "_app/_authenticated/dashboard/index.tsx",
+      "parent": "/_app/_authenticated"
+    },
+    "/_app/_authenticated/user/settings/": {
+      "filePath": "_app/_authenticated/user/settings/index.tsx",
       "parent": "/_app/_authenticated"
     }
   }

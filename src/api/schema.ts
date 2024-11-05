@@ -34,9 +34,36 @@ export const Vehicle = z.object({
   name: z.string(),
 });
 
+export const User = z.object({
+  id: z.number(),
+  username: z.string(),
+  email: z.string(),
+  created_at: z.string(),
+  updated_at: z.string(),
+  // vehicles: z.array(Vehicle),
+});
+
+export const VehicleMenuItem = z.object({
+  text: z.string(),
+  value: z.string(),
+});
+
+export const VehicleData = z.object({
+  avgMpg: z.string(),
+  cityPercent: z.string(),
+  highwayPercent: z.string(),
+  maxMpg: z.string(),
+  minMpg: z.string(),
+  recordCount: z.string(),
+  vehicleId: z.string(),
+});
+
 export type LoginCredientials = z.infer<typeof LoginCredientials>;
 export type RegisterCredientials = z.infer<typeof RegisterCredientials>;
 export type LatLngObject = z.infer<typeof LatLngObject>;
 export type LocationObject = z.infer<typeof LocationObject>;
 export type Passanger = z.infer<typeof Passanger>;
 export type Vehicle = z.infer<typeof Vehicle>;
+export type User = z.infer<typeof User>;
+export type VehicleMenuItem = z.infer<typeof VehicleMenuItem>;
+export type VehicleData = z.infer<typeof VehicleData>;
