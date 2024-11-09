@@ -1,28 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { fetchYears, fetchMakes, fetchModels, fetchOptions, fetchVehicleData } from '@/api/vehicleApi';
 import { VehicleMenuItem } from '@/api/schema';
-import { Combobox } from '@/components/ui/Combobox';
+import { Combobox } from '@/components/ui/combobox';
 import { toast } from 'sonner';
 import { Input } from '../ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Label } from '../ui/label';
 import { Button } from '../ui/button';
 import ky from '@/api/utils/ky';
-import { version } from 'os';
 
 const AddVehicle: React.FC = () => {
   const [years, setYears] = useState<VehicleMenuItem[]>([]);
   const [makes, setMakes] = useState<VehicleMenuItem[]>([]);
   const [models, setModels] = useState<VehicleMenuItem[]>([]);
   const [options, setOptions] = useState<VehicleMenuItem[]>([]);
+  const [fuelTypes] = useState([
+    { label: '95', value: '95' },
+    { label: '98', value: '98' },
+    { label: 'Diesel', value: 'diesel' },
+  ]);
 
   const [selectedYear, setSelectedYear] = useState<string>('');
   const [selectedMake, setSelectedMake] = useState<string>('');
   const [selectedModel, setSelectedModel] = useState<string>('');
   const [selectedVersion, setSelectedVersion] = useState<string>('');
+  const [selectedFuelType, setSelectedFuelType] = useState<string>('');
 
   const [showInput, setShowInput] = useState<boolean>(false);
-  const [efficiency, setEfficiency] = useState<number>();
+  const [efficiency, setEfficiency] = useState<number | null>(null);
 
   useEffect(() => {
     const loadYears = async () => {
@@ -54,6 +59,9 @@ const AddVehicle: React.FC = () => {
       setSelectedModel('');
       setOptions([]);
       setSelectedVersion('');
+      setSelectedFuelType('');
+      setEfficiency(null);
+      setShowInput(false);
     }
   }, [selectedYear]);
 
@@ -73,6 +81,9 @@ const AddVehicle: React.FC = () => {
       setSelectedModel('');
       setOptions([]);
       setSelectedVersion('');
+      setSelectedFuelType('');
+      setEfficiency(null);
+      setShowInput(false);
     }
   }, [selectedYear, selectedMake]);
 
@@ -90,6 +101,9 @@ const AddVehicle: React.FC = () => {
     } else {
       setOptions([]);
       setSelectedVersion('');
+      setSelectedFuelType('');
+      setEfficiency(null);
+      setShowInput(false);
     }
   }, [selectedYear, selectedMake, selectedModel]);
 
@@ -97,10 +111,12 @@ const AddVehicle: React.FC = () => {
     const fetchVehicleDataFromApi = async () => {
       const vehicleId = selectedVersion;
       const data = await fetchVehicleData(vehicleId);
+
       const mpgToLPer100km = 235.215; // Conversion factor from MPG to L/100km
       const efficiency = mpgToLPer100km / parseFloat(data.avgMpg);
       if (efficiency) {
         setEfficiency(efficiency);
+        setShowInput(false);
       } else {
         setShowInput(true);
       }
@@ -111,19 +127,37 @@ const AddVehicle: React.FC = () => {
 
   const handleAddVehicle = async () => {
     try {
-      ky.post('vehicles', {
+      const response = await ky.post('vehicles', {
         json: {
           year: selectedYear,
           manufacturer: selectedMake,
           model: selectedModel,
           version: options.find(version => version.value === selectedVersion)?.text,
+          fuel_type: selectedFuelType,
           fuel_efficiency: efficiency?.toFixed(2),
         },
       });
-      // toast.success('Vehicle added successfully');
-    } catch {
+
+      if (!response.ok) {
+        throw new Error('Failed to add vehicle');
+      }
+
+      clearFields();
+
+      toast.success('Vehicle added successfully');
+    } catch (error) {
+      console.log(error);
       toast.error('Error adding vehicle');
     }
+  };
+
+  const clearFields = () => {
+    setSelectedYear('');
+    setSelectedMake('');
+    setSelectedModel('');
+    setSelectedVersion('');
+    setSelectedFuelType('');
+    setEfficiency(null);
   };
 
   const handleEfficiencyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,7 +165,7 @@ const AddVehicle: React.FC = () => {
     const regex = /^(100(\.0{0,2})?|[1-9]?[0-9](\.[0-9]{0,2})?)$/;
 
     if (regex.test(value) || value === '') {
-      setEfficiency(value === '' ? 0 : parseFloat(value));
+      setEfficiency(value === '' ? null : parseFloat(value));
     }
   };
 
@@ -140,8 +174,6 @@ const AddVehicle: React.FC = () => {
       e.preventDefault();
     }
   };
-
-  console.log(selectedVersion);
 
   return (
     <Card className="w-1/4">
@@ -159,6 +191,9 @@ const AddVehicle: React.FC = () => {
               setSelectedMake('');
               setSelectedModel('');
               setSelectedVersion('');
+              setSelectedFuelType('');
+              setEfficiency(null);
+              setShowInput(false);
             }}
             options={years.map(year => ({ label: year.text, value: year.value }))}
             placeholder="Select Year"
@@ -172,6 +207,9 @@ const AddVehicle: React.FC = () => {
               setSelectedMake(value);
               setSelectedModel('');
               setSelectedVersion('');
+              setSelectedFuelType('');
+              setEfficiency(null);
+              setShowInput(false);
             }}
             options={makes.map(make => ({ label: make.text, value: make.value }))}
             placeholder="Select Make"
@@ -185,6 +223,9 @@ const AddVehicle: React.FC = () => {
             onChange={value => {
               setSelectedModel(value);
               setSelectedVersion('');
+              setSelectedFuelType('');
+              setEfficiency(null);
+              setShowInput(false);
             }}
             options={models.map(model => ({ label: model.text, value: model.value }))}
             placeholder="Select Model"
@@ -197,17 +238,30 @@ const AddVehicle: React.FC = () => {
             value={selectedVersion}
             onChange={value => {
               setSelectedVersion(value);
+              setSelectedFuelType('');
+              setEfficiency(null);
+              setShowInput(false);
             }}
             options={options.map(option => ({ label: option.text, value: option.value }))}
             placeholder="Select Option"
             disabled={!selectedModel}
           />
         </div>
+        <div className="flex w-full items-center gap-4">
+          <Label>Fuel Type:</Label>
+          <Combobox
+            value={selectedFuelType}
+            onChange={setSelectedFuelType}
+            options={fuelTypes}
+            placeholder="Select Fuel Type"
+            disabled={!selectedVersion}
+          />
+        </div>
 
         {showInput && (
           <div className="flex w-full items-center gap-4">
             <Input
-              value={efficiency}
+              value={efficiency || ''}
               onChange={handleEfficiencyChange}
               onKeyDown={handleKeyDown}
               placeholder="Enter l/100km"

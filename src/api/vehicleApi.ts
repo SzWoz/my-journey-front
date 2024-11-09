@@ -37,5 +37,5 @@ export const fetchOptions = async (year: string, make: string, model: string): P
 
 export const fetchVehicleData = async (vehicleId: string): Promise<VehicleData> => {
   const response = await api.get(`ws/rest/ympg/shared/ympgVehicle/${vehicleId}`).json<VehicleData>();
-  return VehicleData.parse(response);
+  return response;
 };
