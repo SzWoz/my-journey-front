@@ -1,6 +1,7 @@
-import AddVehicle from '@/components/add-vehicle';
-import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
+import { createFileRoute } from '@tanstack/react-router';
+import AddVehicle from '../-components/add-vehicle';
+import VehicleTable from '../-components/vehicles-table';
 
 export const Route = createFileRoute('/_app/_authenticated/user/settings/')({
   component: Settings,
@@ -8,9 +9,13 @@ export const Route = createFileRoute('/_app/_authenticated/user/settings/')({
 
 function Settings() {
   return (
-    <section className="min-h-screen">
-      <h1>Settings</h1>
-      <AddVehicle />
+    <section className="grid min-h-screen grid-cols-3 gap-4">
+      <div className="col-span-1">
+        <AddVehicle />
+      </div>
+      <div className="col-span-2">
+        <VehicleTable />
+      </div>
     </section>
   );
 }
