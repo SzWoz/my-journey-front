@@ -38,8 +38,6 @@ function MapView({ locations, setTotalDistance, editLocation }: MapViewProps) {
     setDirectionsRenderer(new routesLibrary.DirectionsRenderer({ map }));
   }, [map, routesLibrary]);
 
-  console.log({ locations });
-
   useEffect(() => {
     if (!directionService || !directionsRenderer || locations.length < 2) return;
 

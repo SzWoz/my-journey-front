@@ -11,6 +11,8 @@ import { MultiSelect } from '@/components/ui/multi-select';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { useQuery } from '@tanstack/react-query';
+import { vehiclesQueryOptions } from '@/queries/vehicles';
 
 export const Route = createFileRoute('/_app/_authenticated/dashboard/')({
   component: DashboardLayout,
@@ -36,12 +38,9 @@ function DashboardLayout() {
   const [passangers, setPassangers] = useState<Passanger[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<string>();
 
-  // this will come from backend
-  const vehicles = [
-    { id: '1', name: 'Car' },
-    { id: '2', name: 'Bike' },
-    { id: '3', name: 'Bus' },
-  ];
+  const { data: vehicleData } = useQuery(vehiclesQueryOptions);
+
+  console.log(vehicleData);
 
   const handlePassangerInput = (newPassanger: Passanger) => {
     setPassangers(prev => [...prev, newPassanger]);
@@ -103,9 +102,9 @@ function DashboardLayout() {
                   <SelectValue placeholder="Select your vehicle" />
                 </SelectTrigger>
                 <SelectContent>
-                  {vehicles.map(vehicle => (
+                  {vehicleData?.map(vehicle => (
                     <SelectItem key={vehicle.id} value={vehicle.id}>
-                      {vehicle.name}
+                      {vehicle.manufacturer} {vehicle.model}
                     </SelectItem>
                   ))}
                 </SelectContent>
