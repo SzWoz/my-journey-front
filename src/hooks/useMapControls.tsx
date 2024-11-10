@@ -35,7 +35,7 @@ export function useMapControls() {
 
   const formattedTotalDistance = useMemo(() => {
     return `${(totalDistance / 1000).toFixed(2)} km`;
-  }, [totalDistance]);
+  }, [totalDistance, locations]);
 
   const addLocation = useCallback((location: LocationObject) => {
     setLocations(prevLocations => [...prevLocations, location]);
@@ -57,5 +57,28 @@ export function useMapControls() {
     });
   }, []);
 
-  return { locations, addLocation, formattedTotalDistance, setTotalDistance, editLocation, assignUsers };
+  const unassignUser = useCallback((userId: string) => {
+    setLocations(prevLocations => {
+      const newLocations = [...prevLocations];
+      newLocations.forEach(location => {
+        location.assignedUsers = location.assignedUsers?.filter(user => user.id !== userId);
+      });
+      return newLocations;
+    });
+  }, []);
+
+  const removeLocation = useCallback((address: string) => {
+    setLocations(prevLocations => prevLocations.filter(location => location.data.formattedAddress !== address));
+  }, []);
+
+  return {
+    locations,
+    addLocation,
+    formattedTotalDistance,
+    setTotalDistance,
+    editLocation,
+    assignUsers,
+    unassignUser,
+    removeLocation,
+  };
 }

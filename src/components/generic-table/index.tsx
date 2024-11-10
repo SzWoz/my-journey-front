@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { TableHead, TableRow } from '../ui/table';
 import { AnimatePresence, motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 type GenericTableProps<T> = {
   headers: string[];
@@ -9,6 +10,8 @@ type GenericTableProps<T> = {
   children?: React.ReactNode;
   renderHeader?: (header: string, index: number) => React.ReactNode;
   renderCell?: (item: T, accessor: keyof T, rowIndex: number, cellIndex: number) => React.ReactNode;
+  actionButton?: (item: T) => React.ReactNode;
+  className?: string;
 };
 
 const tableRowVariants = {
@@ -16,7 +19,16 @@ const tableRowVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-function GenericTable<T>({ headers, data, dataAccessors, renderHeader, renderCell, children }: GenericTableProps<T>) {
+function GenericTable<T>({
+  headers,
+  data,
+  dataAccessors,
+  renderHeader,
+  renderCell,
+  children,
+  actionButton,
+  className,
+}: GenericTableProps<T>) {
   const tableBody = useMemo(() => {
     if (children) return children;
     if (!data || !dataAccessors) return null;
@@ -30,7 +42,7 @@ function GenericTable<T>({ headers, data, dataAccessors, renderHeader, renderCel
           transition={{ duration: 0.5, delay: 0.1 }}
           className="p-4 text-center text-2xl text-gray-600"
         >
-          <motion.td colSpan={dataAccessors.length}>No data</motion.td>
+          <motion.td colSpan={dataAccessors.length + (actionButton ? 1 : 0)}>No data</motion.td>
         </motion.tr>
       );
     }
@@ -55,23 +67,36 @@ function GenericTable<T>({ headers, data, dataAccessors, renderHeader, renderCel
             {renderCell ? renderCell(item, accessor, rowIndex, cellIndex) : String(item[accessor])}
           </motion.td>
         ))}
+        {actionButton && (
+          <motion.td
+            className="p-4 text-end"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            {actionButton(item)}
+          </motion.td>
+        )}
       </motion.tr>
     ));
-  }, [children, data, dataAccessors]);
+  }, [children, data, dataAccessors, actionButton]);
 
   return (
-    <table className="w-full">
-      <thead>
-        <TableRow>
-          {headers.map((header, index) => (
-            <TableHead key={index}>{renderHeader ? renderHeader(header, index) : header}</TableHead>
-          ))}
-        </TableRow>
-      </thead>
-      <tbody>
-        <AnimatePresence>{tableBody}</AnimatePresence>
-      </tbody>
-    </table>
+    <div className={cn('overflow-auto', className)}>
+      <table className="w-full">
+        <thead className="sticky top-0 z-10 bg-[#09090B]">
+          <TableRow>
+            {headers.map((header, index) => (
+              <TableHead key={index}>{renderHeader ? renderHeader(header, index) : header}</TableHead>
+            ))}
+            {actionButton && <TableHead className="text-end">Action</TableHead>}
+          </TableRow>
+        </thead>
+        <tbody>
+          <AnimatePresence>{tableBody}</AnimatePresence>
+        </tbody>
+      </table>
+    </div>
   );
 }
 

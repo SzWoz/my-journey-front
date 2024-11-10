@@ -10,6 +10,9 @@ import GenericTable from '@/components/generic-table';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { useQuery } from '@tanstack/react-query';
+import { vehiclesQueryOptions } from '@/queries/vehicles';
 
 export const Route = createFileRoute('/_app/_authenticated/dashboard/')({
   component: DashboardLayout,
@@ -21,18 +24,23 @@ const cardVariants = {
 };
 
 function DashboardLayout() {
-  const { locations, addLocation, formattedTotalDistance, setTotalDistance, editLocation, assignUsers } =
-    useMapControls();
+  const {
+    locations,
+    addLocation,
+    formattedTotalDistance,
+    setTotalDistance,
+    editLocation,
+    assignUsers,
+    unassignUser,
+    removeLocation,
+  } = useMapControls();
 
   const [passangers, setPassangers] = useState<Passanger[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<string>();
 
-  // this will come from backend
-  const vehicles = [
-    { id: '1', name: 'Car' },
-    { id: '2', name: 'Bike' },
-    { id: '3', name: 'Bus' },
-  ];
+  const { data: vehicleData } = useQuery(vehiclesQueryOptions);
+
+  console.log(vehicleData);
 
   const handlePassangerInput = (newPassanger: Passanger) => {
     setPassangers(prev => [...prev, newPassanger]);
@@ -44,13 +52,16 @@ function DashboardLayout() {
     assignedUsers: location.assignedUsers,
   }));
 
-  console.log(locations);
-
   const assignPassangersToLocation = (index: number, ids: string[]) => {
     assignUsers(
       index,
       ids.map(id => passangers.find(passanger => passanger.id === id)!),
     );
+  };
+
+  const removePassanger = (id: string) => {
+    setPassangers(prev => prev.filter(passanger => passanger.id !== id));
+    unassignUser(id);
   };
 
   return (
@@ -91,9 +102,9 @@ function DashboardLayout() {
                   <SelectValue placeholder="Select your vehicle" />
                 </SelectTrigger>
                 <SelectContent>
-                  {vehicles.map(vehicle => (
+                  {vehicleData?.map(vehicle => (
                     <SelectItem key={vehicle.id} value={vehicle.id}>
-                      {vehicle.name}
+                      {vehicle.manufacturer} {vehicle.model}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -113,7 +124,8 @@ function DashboardLayout() {
                         <MultiSelect
                           options={passangers.map(passanger => ({ label: passanger.name, value: passanger.id }))}
                           onValueChange={ids => assignPassangersToLocation(rowIndex, ids)}
-                          defaultValue={item.assignedUsers?.map(user => user.id) ?? []}
+                          setSelectedValues={ids => assignPassangersToLocation(rowIndex, ids)}
+                          selectedValues={item.assignedUsers?.map(user => user.id) ?? []}
                           placeholder="Assign Passangers"
                           variant="inverted"
                           maxCount={2}
@@ -122,6 +134,11 @@ function DashboardLayout() {
                     }
                     return String(item[accessor]);
                   }}
+                  actionButton={item => (
+                    <Button variant="outline" onClick={() => removeLocation(item.formattedAddress)}>
+                      X
+                    </Button>
+                  )}
                 />
                 {formattedTotalDistance}
               </div>
@@ -143,7 +160,16 @@ function DashboardLayout() {
             <CardContent>
               <CreatePassangers setPassangers={newPassanger => handlePassangerInput(newPassanger)} />
 
-              <GenericTable data={passangers} headers={['Name']} dataAccessors={['name']} />
+              <GenericTable
+                data={passangers}
+                headers={['Name']}
+                dataAccessors={['name']}
+                actionButton={item => (
+                  <Button variant="outline" onClick={() => removePassanger(item.id)}>
+                    Delete
+                  </Button>
+                )}
+              />
             </CardContent>
           </Card>
         </motion.div>
