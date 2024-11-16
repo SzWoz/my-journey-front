@@ -1,4 +1,4 @@
-import { Vehicles } from './schema';
+import { Vehicle, Vehicles } from './schema';
 import ky from './utils/ky';
 
 export const fetchVehicles = async () => {
@@ -9,4 +9,16 @@ export const fetchVehicles = async () => {
     console.error('Error fetching vehicles:', error);
     throw error;
   }
+};
+
+export const addVehicle = async (vehicle: Omit<Vehicle, 'id'>) => {
+  const response = await ky.post('vehicles', {
+    json: vehicle,
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to add vehicle');
+  }
+
+  return response.json();
 };
