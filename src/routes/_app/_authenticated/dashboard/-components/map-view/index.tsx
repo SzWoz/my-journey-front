@@ -10,20 +10,20 @@ type MapViewProps = {
   editLocation: (index: number, location: LocationObject) => void;
 };
 
-const mockResponse = {
-  routes: [
-    {
-      legs: [
-        {
-          distance: { value: 10000 }, // 10 km
-        },
-        {
-          distance: { value: 20000 }, // 20 km
-        },
-      ],
-    },
-  ],
-};
+// const mockResponse = {
+//   routes: [
+//     {
+//       legs: [
+//         {
+//           distance: { value: 10000 }, // 10 km
+//         },
+//         {
+//           distance: { value: 20000 }, // 20 km
+//         },
+//       ],
+//     },
+//   ],
+// };
 
 function MapView({ locations, setTotalDistance, editLocation }: MapViewProps) {
   const map = useMap();
@@ -47,56 +47,75 @@ function MapView({ locations, setTotalDistance, editLocation }: MapViewProps) {
     }));
 
     // Mocking the response instead of calling the actual API
-    const response = mockResponse;
-    const status = 'OK';
+    // const response = mockResponse;
+    // const status = 'OK';
 
-    if (status === 'OK' && response) {
-      directionsRenderer.setDirections(response as any); // Cast to any to avoid type errors
+    // if (status === 'OK' && response) {
+    //   directionsRenderer.setDirections(response as any); // Cast to any to avoid type errors
 
-      const totalDistance = response.routes[0].legs.reduce((total, leg) => {
-        if (leg.distance) {
-          return total + leg.distance.value;
-        }
-        return total;
-      }, 0);
+    //   const totalDistance = response.routes[0].legs.reduce((total, leg) => {
+    //     if (leg.distance) {
+    //       return total + leg.distance.value;
+    //     }
+    //     return total;
+    //   }, 0);
 
-      const locationsWithDistance = locations.map((location, index) => {
-        if (index === 0) {
-          return { ...location, distance: undefined }; // Starting location has no distance
-        }
-        const distance = response.routes[0].legs[index - 1]?.distance?.value || 0;
-        return { ...location, distance };
-      });
+    //   const locationsWithDistance = locations.map((location, index) => {
+    //     if (index === 0) {
+    //       return { ...location, distance: undefined }; // Starting location has no distance
+    //     }
+    //     const distance = response.routes[0].legs[index - 1]?.distance?.value || 0;
+    //     return { ...location, distance };
+    //   });
 
-      locationsWithDistance.forEach((location, index) => {
-        editLocation(index, location);
-      });
+    //   locationsWithDistance.forEach((location, index) => {
+    //     editLocation(index, location);
+    //   });
 
-      setTotalDistance(totalDistance);
-    } else {
-      console.error('Directions request failed due to ' + status);
-    }
+    //   setTotalDistance(totalDistance);
+    // } else {
+    //   console.error('Directions request failed due to ' + status);
+    // }
 
     // Production code commented out
 
-    // directionService.route(
-    //   {
-    //     origin: locations[0].data,
-    //     destination: locations[locations.length - 1].data,
-    //     waypoints,
-    //     travelMode: google.maps.TravelMode.DRIVING,
-    //   },
-    //   (response, status) => {
-    //     if (status === 'OK' && response) {
-    //       directionsRenderer.setDirections(response);
-    //       console.log(response);
+    directionService.route(
+      {
+        origin: locations[0].data,
+        destination: locations[locations.length - 1].data,
+        waypoints,
+        travelMode: google.maps.TravelMode.DRIVING,
+      },
+      (response, status) => {
+        if (status === 'OK' && response) {
+          directionsRenderer.setDirections(response);
+          console.log(response);
 
-    //       const totalDistance = response.routes[0].legs.reduce((total, leg) => {
-    //         if (leg.distance) {
-    //           return total + leg.distance.value;
-    //         }
-    //         return total;
-    //       }, 0);
+          const totalDistance = response.routes[0].legs.reduce((total, leg) => {
+            if (leg.distance) {
+              return total + leg.distance.value;
+            }
+            return total;
+          }, 0);
+
+          const locationsWithDistance = locations.map((location, index) => {
+            if (index === 0) {
+              return { ...location, distance: undefined }; // Starting location has no distance
+            }
+            const distance = response.routes[0].legs[index - 1]?.distance?.value || 0;
+            return { ...location, distance };
+          });
+
+          locationsWithDistance.forEach((location, index) => {
+            editLocation(index, location);
+          });
+
+          setTotalDistance(totalDistance);
+        } else {
+          console.error('Directions request failed due to ' + status);
+        }
+      },
+    );
 
     //       const newLocations = [...locations];
     //       response.routes[0].legs.forEach(leg => {

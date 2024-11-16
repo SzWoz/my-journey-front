@@ -13,6 +13,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { vehiclesQueryOptions } from '@/queries/vehicles';
+import { convertToKm } from '@/helpers/convertToKm';
 
 export const Route = createFileRoute('/_app/_authenticated/dashboard/')({
   component: DashboardLayout,
@@ -48,7 +49,7 @@ function DashboardLayout() {
 
   const processedLocations = locations.map(location => ({
     formattedAddress: location.data.formattedAddress,
-    distance: location.distance ?? 0,
+    distance: `${convertToKm(location.distance || 0)} km`,
     assignedUsers: location.assignedUsers,
   }));
 
@@ -94,7 +95,7 @@ function DashboardLayout() {
           variants={cardVariants}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <Card className="h-full">
+          <Card className="h-fit">
             <CardHeader className="flex flex-row justify-between">
               <CardTitle>Plan Your Journey</CardTitle>
               <Select value={selectedVehicle} onValueChange={id => setSelectedVehicle(id)}>
@@ -103,7 +104,7 @@ function DashboardLayout() {
                 </SelectTrigger>
                 <SelectContent>
                   {vehicleData?.map(vehicle => (
-                    <SelectItem key={vehicle.id} value={vehicle.id}>
+                    <SelectItem key={vehicle.id} value={String(vehicle.id)}>
                       {vehicle.manufacturer} {vehicle.model}
                     </SelectItem>
                   ))}
@@ -111,11 +112,15 @@ function DashboardLayout() {
               </Select>
             </CardHeader>
             <CardContent>
-              <div className="grid">
+              <div className="grid gap-4">
                 <Autocomplete addLocation={addLocation} />
 
+                <Button className="w-1/2 place-self-center" onClick={() => {}}>
+                  Calculate Costs
+                </Button>
+
                 <GenericTable
-                  headers={['Location', 'Distance from start', 'Assigned user']}
+                  headers={['Location', 'Distance from previous point', 'Assigned user']}
                   data={processedLocations}
                   dataAccessors={['formattedAddress', 'distance', 'assignedUsers']}
                   renderCell={(item, accessor, rowIndex) => {
@@ -153,12 +158,15 @@ function DashboardLayout() {
           variants={cardVariants}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Card className="h-full">
+          <Card className="h-fit">
             <CardHeader>
               <CardTitle>Add passangers</CardTitle>
             </CardHeader>
             <CardContent>
-              <CreatePassangers setPassangers={newPassanger => handlePassangerInput(newPassanger)} />
+              <CreatePassangers
+                passangers={passangers}
+                setPassangers={newPassanger => handlePassangerInput(newPassanger)}
+              />
 
               <GenericTable
                 data={passangers}

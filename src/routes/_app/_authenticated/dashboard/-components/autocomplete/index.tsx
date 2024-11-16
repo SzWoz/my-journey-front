@@ -38,7 +38,7 @@ function Autocomplete({ addLocation }: AutocompleteProps) {
   }, [places]);
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex items-center gap-4">
       <Input ref={inputRef} />
       <Button onClick={() => handleLocationSelection()}>Select Location</Button>
     </div>

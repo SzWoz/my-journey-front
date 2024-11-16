@@ -1,36 +1,36 @@
 import { LocationObject, Passanger } from '@/api/schema';
 import { useCallback, useMemo, useState } from 'react';
 
-const MOCKED_LOCATIONS: LocationObject[] = [
-  {
-    data: {
-      lat: 50.2936331,
-      lng: 18.7381664,
-      formattedAddress: 'Bracka 9, 44-103 Gliwice, Polska',
-    },
-    distance: 23367,
-    assignedUsers: [],
-  },
-  {
-    data: {
-      lat: 50.29386019999999,
-      lng: 18.6650001,
-      formattedAddress: 'Rynek 6, 44-100 Gliwice, Polska',
-    },
-    assignedUsers: [],
-  },
-  {
-    data: {
-      lat: 50.2794001,
-      lng: 18.95634,
-      formattedAddress: 'Sportowa 29, 41-506 Chorzów, Polska',
-    },
-    assignedUsers: [],
-  },
-];
+// const MOCKED_LOCATIONS: LocationObject[] = [
+//   {
+//     data: {
+//       lat: 50.2936331,
+//       lng: 18.7381664,
+//       formattedAddress: 'Bracka 9, 44-103 Gliwice, Polska',
+//     },
+//     distance: 23367,
+//     assignedUsers: [],
+//   },
+//   {
+//     data: {
+//       lat: 50.29386019999999,
+//       lng: 18.6650001,
+//       formattedAddress: 'Rynek 6, 44-100 Gliwice, Polska',
+//     },
+//     assignedUsers: [],
+//   },
+//   {
+//     data: {
+//       lat: 50.2794001,
+//       lng: 18.95634,
+//       formattedAddress: 'Sportowa 29, 41-506 Chorzów, Polska',
+//     },
+//     assignedUsers: [],
+//   },
+// ];
 
 export function useMapControls() {
-  const [locations, setLocations] = useState<LocationObject[]>(MOCKED_LOCATIONS);
+  const [locations, setLocations] = useState<LocationObject[]>([]);
   const [totalDistance, setTotalDistance] = useState<number>(0);
 
   const formattedTotalDistance = useMemo(() => {
