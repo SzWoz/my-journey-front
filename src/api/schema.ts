@@ -1,3 +1,5 @@
+import { create } from 'domain';
+import { distance } from 'framer-motion';
 import { z } from 'zod';
 
 export const LoginCredientials = z.object({
@@ -38,6 +40,28 @@ export const User = z.object({
   // vehicles: z.array(Vehicle),
 });
 
+export const ProcessedLocation = z.object({
+  id: z.number(),
+  journey_id: z.number(),
+  formatted_address: z.string(),
+  lat: z.number(),
+  lng: z.number(),
+  distance: z.number().nullable(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+export const Journey = z.object({
+  id: z.number(),
+  user_id: z.number(),
+  vehicle_id: z.number(),
+  created_at: z.string(),
+  updated_at: z.string(),
+  locations: z.array(ProcessedLocation),
+  passengers: z.array(Passanger.extend({ id: z.number(), cost: z.string() })),
+});
+
+export const Journeys = z.array(Journey);
+
 export const VehicleMenuItem = z.object({
   text: z.string(),
   value: z.string(),
@@ -75,3 +99,5 @@ export type User = z.infer<typeof User>;
 export type VehicleMenuItem = z.infer<typeof VehicleMenuItem>;
 export type VehicleData = z.infer<typeof VehicleData>;
 export type Vehicles = z.infer<typeof Vehicles>;
+export type Journey = z.infer<typeof Journey>;
+export type Journeys = z.infer<typeof Journeys>;

@@ -21,6 +21,7 @@ import { Route as AuthAuthLogoutImport } from './routes/auth/_auth.logout'
 import { Route as AuthAuthLoginImport } from './routes/auth/_auth.login'
 import { Route as AppAuthenticatedDashboardIndexImport } from './routes/_app/_authenticated/dashboard/index'
 import { Route as AppAuthenticatedUserSettingsIndexImport } from './routes/_app/_authenticated/user/settings/index'
+import { Route as AppAuthenticatedUserJourneysIndexImport } from './routes/_app/_authenticated/user/journeys/index'
 
 // Create Virtual Routes
 
@@ -72,6 +73,12 @@ const AppAuthenticatedDashboardIndexRoute =
 const AppAuthenticatedUserSettingsIndexRoute =
   AppAuthenticatedUserSettingsIndexImport.update({
     path: '/user/settings/',
+    getParentRoute: () => AppAuthenticatedRoute,
+  } as any)
+
+const AppAuthenticatedUserJourneysIndexRoute =
+  AppAuthenticatedUserJourneysIndexImport.update({
+    path: '/user/journeys/',
     getParentRoute: () => AppAuthenticatedRoute,
   } as any)
 
@@ -135,6 +142,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuthenticatedDashboardIndexImport
       parentRoute: typeof AppAuthenticatedImport
     }
+    '/_app/_authenticated/user/journeys/': {
+      id: '/_app/_authenticated/user/journeys/'
+      path: '/user/journeys'
+      fullPath: '/user/journeys'
+      preLoaderRoute: typeof AppAuthenticatedUserJourneysIndexImport
+      parentRoute: typeof AppAuthenticatedImport
+    }
     '/_app/_authenticated/user/settings/': {
       id: '/_app/_authenticated/user/settings/'
       path: '/user/settings'
@@ -149,11 +163,14 @@ declare module '@tanstack/react-router' {
 
 interface AppAuthenticatedRouteChildren {
   AppAuthenticatedDashboardIndexRoute: typeof AppAuthenticatedDashboardIndexRoute
+  AppAuthenticatedUserJourneysIndexRoute: typeof AppAuthenticatedUserJourneysIndexRoute
   AppAuthenticatedUserSettingsIndexRoute: typeof AppAuthenticatedUserSettingsIndexRoute
 }
 
 const AppAuthenticatedRouteChildren: AppAuthenticatedRouteChildren = {
   AppAuthenticatedDashboardIndexRoute: AppAuthenticatedDashboardIndexRoute,
+  AppAuthenticatedUserJourneysIndexRoute:
+    AppAuthenticatedUserJourneysIndexRoute,
   AppAuthenticatedUserSettingsIndexRoute:
     AppAuthenticatedUserSettingsIndexRoute,
 }
@@ -204,6 +221,7 @@ export interface FileRoutesByFullPath {
   '/auth/logout': typeof AuthAuthLogoutRoute
   '/auth/register': typeof AuthAuthRegisterRoute
   '/dashboard': typeof AppAuthenticatedDashboardIndexRoute
+  '/user/journeys': typeof AppAuthenticatedUserJourneysIndexRoute
   '/user/settings': typeof AppAuthenticatedUserSettingsIndexRoute
 }
 
@@ -214,6 +232,7 @@ export interface FileRoutesByTo {
   '/auth/logout': typeof AuthAuthLogoutRoute
   '/auth/register': typeof AuthAuthRegisterRoute
   '/dashboard': typeof AppAuthenticatedDashboardIndexRoute
+  '/user/journeys': typeof AppAuthenticatedUserJourneysIndexRoute
   '/user/settings': typeof AppAuthenticatedUserSettingsIndexRoute
 }
 
@@ -227,6 +246,7 @@ export interface FileRoutesById {
   '/auth/_auth/logout': typeof AuthAuthLogoutRoute
   '/auth/_auth/register': typeof AuthAuthRegisterRoute
   '/_app/_authenticated/dashboard/': typeof AppAuthenticatedDashboardIndexRoute
+  '/_app/_authenticated/user/journeys/': typeof AppAuthenticatedUserJourneysIndexRoute
   '/_app/_authenticated/user/settings/': typeof AppAuthenticatedUserSettingsIndexRoute
 }
 
@@ -239,6 +259,7 @@ export interface FileRouteTypes {
     | '/auth/logout'
     | '/auth/register'
     | '/dashboard'
+    | '/user/journeys'
     | '/user/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -248,6 +269,7 @@ export interface FileRouteTypes {
     | '/auth/logout'
     | '/auth/register'
     | '/dashboard'
+    | '/user/journeys'
     | '/user/settings'
   id:
     | '__root__'
@@ -259,6 +281,7 @@ export interface FileRouteTypes {
     | '/auth/_auth/logout'
     | '/auth/_auth/register'
     | '/_app/_authenticated/dashboard/'
+    | '/_app/_authenticated/user/journeys/'
     | '/_app/_authenticated/user/settings/'
   fileRoutesById: FileRoutesById
 }
@@ -300,6 +323,7 @@ export const routeTree = rootRoute
       "parent": "/_app",
       "children": [
         "/_app/_authenticated/dashboard/",
+        "/_app/_authenticated/user/journeys/",
         "/_app/_authenticated/user/settings/"
       ]
     },
@@ -332,6 +356,10 @@ export const routeTree = rootRoute
     },
     "/_app/_authenticated/dashboard/": {
       "filePath": "_app/_authenticated/dashboard/index.tsx",
+      "parent": "/_app/_authenticated"
+    },
+    "/_app/_authenticated/user/journeys/": {
+      "filePath": "_app/_authenticated/user/journeys/index.tsx",
       "parent": "/_app/_authenticated"
     },
     "/_app/_authenticated/user/settings/": {

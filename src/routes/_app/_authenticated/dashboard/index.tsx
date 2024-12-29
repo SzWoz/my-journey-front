@@ -5,15 +5,17 @@ import Autocomplete from './-components/autocomplete';
 import MapView from './-components/map-view';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CreatePassangers } from './-components/passangers';
-import { Passanger } from '@/api/schema';
+import { LocationObject, Passanger } from '@/api/schema';
 import GenericTable from '@/components/generic-table';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { vehiclesQueryOptions } from '@/queries/vehicles';
 import { convertToKm } from '@/helpers/convertToKm';
+import { toast } from 'sonner';
+import { addJourney } from '@/api/journey';
 
 export const Route = createFileRoute('/_app/_authenticated/dashboard/')({
   component: DashboardLayout,
@@ -41,7 +43,18 @@ function DashboardLayout() {
 
   const { data: vehicleData } = useQuery(vehiclesQueryOptions);
 
-  console.log(vehicleData);
+  const addJourneyMutation = useMutation({
+    mutationFn: (data: { locations: LocationObject[]; vehicle_id: string }) =>
+      addJourney(data.locations, data.vehicle_id),
+    onSuccess: () => {
+      // queryClient.invalidateQueries({ queryKey: journeysQueryOptions.queryKey });
+      toast.success('Journey added successfully');
+      // clearFields();
+    },
+    onError: () => {
+      toast.error('Error adding journey');
+    },
+  });
 
   const handlePassangerInput = (newPassanger: Passanger) => {
     setPassangers(prev => [...prev, newPassanger]);
@@ -115,7 +128,13 @@ function DashboardLayout() {
               <div className="grid gap-4">
                 <Autocomplete addLocation={addLocation} />
 
-                <Button className="w-1/2 place-self-center" onClick={() => {}}>
+                <Button
+                  className="w-1/2 place-self-center"
+                  onClick={() => {
+                    if (!selectedVehicle) return toast.error('Select a vehicle first');
+                    addJourneyMutation.mutate({ locations, vehicle_id: selectedVehicle });
+                  }}
+                >
                   Calculate Costs
                 </Button>
 
