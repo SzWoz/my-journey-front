@@ -5,6 +5,7 @@ import { register } from '@/api/auth'; // Adjust the import path as needed
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export const Route = createFileRoute('/auth/_auth/register')({
   component: RegisterLayout,
@@ -55,87 +56,89 @@ function RegisterLayout() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-sm rounded bg-white p-6 shadow-md">
-        <div className="mb-4 flex justify-evenly">
-          <button className="text-violet-500" onClick={() => navigate({ to: '/auth/login' })}>
-            Login
-          </button>
-          <button
-            className="border-b-2 border-violet-500 text-violet-500"
-            onClick={() => navigate({ to: '/auth/register' })}
-          >
-            Register
-          </button>
-        </div>
-        <form onSubmit={handleSubmit}>
-          <h1 className="mb-4 text-2xl font-bold">Register</h1>
+    <div className="flex min-h-screen items-center justify-center">
+      <Card className="w-full max-w-sm text-neutral-200 shadow-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">Register</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-4 flex justify-evenly">
+            <button className="text-neutral-400 hover:text-gray-200" onClick={() => navigate({ to: '/auth/login' })}>
+              Login
+            </button>
+            <button className="border-b-2 border-white text-white" onClick={() => navigate({ to: '/auth/register' })}>
+              Register
+            </button>
+          </div>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <Label htmlFor="username" className="block text-sm font-medium text-neutral-300">
+                Username
+              </Label>
+              <Input
+                id="username"
+                type="text"
+                placeholder="Username"
+                value={formState.username}
+                onChange={e => setFormState({ ...formState, username: e.target.value })}
+                className="mt-1 block w-full text-neutral-200"
+              />
+            </div>
+            <div className="mb-4">
+              <Label htmlFor="email" className="block text-sm font-medium text-neutral-300">
+                Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Email"
+                value={formState.email}
+                onChange={e => setFormState({ ...formState, email: e.target.value })}
+                className="mt-1 block w-full text-neutral-200"
+              />
+            </div>
+            <div className="mb-4">
+              <Label htmlFor="password" className="block text-sm font-medium text-neutral-300">
+                Password
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Password"
+                value={formState.password}
+                onChange={e => setFormState({ ...formState, password: e.target.value })}
+                className="mt-1 block w-full text-neutral-200"
+              />
+            </div>
+            <div className="mb-4">
+              <Label htmlFor="confirmPassword" className="block text-sm font-medium text-neutral-300">
+                Confirm Password
+              </Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="Confirm Password"
+                value={formState.confirmPassword}
+                onChange={e => setFormState({ ...formState, confirmPassword: e.target.value })}
+                className="mt-1 block w-full text-neutral-200"
+              />
+            </div>
 
-          <div className="mb-4">
-            <Label htmlFor="username" className="block text-sm font-medium text-gray-700">
-              Username
-            </Label>
-            <Input
-              id="username"
-              type="text"
-              placeholder="username"
-              value={formState.username}
-              onChange={e => setFormState({ ...formState, username: e.target.value })}
-              className="mt-1 block w-full"
-            />
-          </div>
-          <div className="mb-4">
-            <Label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="email"
-              value={formState.email}
-              onChange={e => setFormState({ ...formState, email: e.target.value })}
-              className="mt-1 block w-full"
-            />
-          </div>
-          <div className="mb-4">
-            <Label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Password
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="password"
-              value={formState.password}
-              onChange={e => setFormState({ ...formState, password: e.target.value })}
-              className="mt-1 block w-full"
-            />
-          </div>
-          <div className="mb-4">
-            <Label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-              Confirm Password
-            </Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="confirm password"
-              value={formState.confirmPassword}
-              onChange={e => setFormState({ ...formState, confirmPassword: e.target.value })}
-              className="mt-1 block w-full"
-            />
-          </div>
+            {errors &&
+              errors.map((error, i) => (
+                <p key={i} className="mt-1 text-sm text-red-500">
+                  {error}
+                </p>
+              ))}
 
-          {errors &&
-            errors.map((error, i) => (
-              <p key={i} className="text-red-500">
-                {error}
-              </p>
-            ))}
-
-          <Button type="submit" className="w-full">
-            Register
-          </Button>
-        </form>
-      </div>
+            <Button type="submit" className="mt-1 w-full">
+              Register
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }
+
+export default RegisterLayout;

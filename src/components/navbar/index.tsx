@@ -40,6 +40,12 @@ function Navbar() {
                 My Journeys
               </DropdownMenuItem>
             </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem className="cursor-pointer" onClick={() => navigate({ to: '/auth/logout' })}>
+                Log Out
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
