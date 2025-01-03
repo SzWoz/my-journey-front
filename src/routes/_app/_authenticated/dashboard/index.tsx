@@ -5,7 +5,7 @@ import Autocomplete from './-components/autocomplete';
 import MapView from './-components/map-view';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CreatePassangers } from './-components/passangers';
-import { LocationObject, Passanger } from '@/api/schema';
+import { Journey, LocationObject, Passanger } from '@/api/schema';
 import GenericTable from '@/components/generic-table';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -15,7 +15,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { vehiclesQueryOptions } from '@/queries/vehicles';
 import { convertToKm } from '@/helpers/convertToKm';
 import { toast } from 'sonner';
-import { addJourney } from '@/api/journey';
+import { addJourney, updateJourney } from '@/api/journey';
 
 export const Route = createFileRoute('/_app/_authenticated/dashboard/')({
   component: DashboardLayout,
@@ -40,19 +40,29 @@ function DashboardLayout() {
 
   const [passangers, setPassangers] = useState<Passanger[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<string>();
+  const [journeyId, setJourneyId] = useState<string | null>(null);
+  const [journeyData, setJourneyData] = useState<Journey>();
 
   const { data: vehicleData } = useQuery(vehiclesQueryOptions);
 
   const addJourneyMutation = useMutation({
-    mutationFn: (data: { locations: LocationObject[]; vehicle_id: string }) =>
-      addJourney(data.locations, data.vehicle_id),
-    onSuccess: () => {
-      // queryClient.invalidateQueries({ queryKey: journeysQueryOptions.queryKey });
-      toast.success('Journey added successfully');
-      // clearFields();
+    mutationFn: (data: { locations: LocationObject[]; vehicle_id: string }) => {
+      if (journeyId) {
+        // If journeyId exists, make a PUT request for updates
+        return updateJourney(journeyId, data.locations, data.vehicle_id); // You need to implement updateJourney API call
+      } else {
+        // If no journeyId, make a POST request to create a new journey
+        return addJourney(data.locations, data.vehicle_id);
+      }
+    },
+    onSuccess: response => {
+      console.log({ response });
+      setJourneyId(String(response?.id));
+      setJourneyData(response);
+      toast.success('Journey added/updated successfully');
     },
     onError: () => {
-      toast.error('Error adding journey');
+      toast.error('Error adding/updating journey');
     },
   });
 
@@ -78,10 +88,10 @@ function DashboardLayout() {
     unassignUser(id);
   };
 
+  console.log(journeyData?.passengers.reduce((acc, passanger) => acc + parseFloat(passanger.cost), 0) || 0);
+
   return (
     <section className="">
-      <div>user statistics</div>
-
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <motion.div
           className="col-span-3 h-[500px] max-h-[500px] overflow-hidden"
@@ -100,13 +110,46 @@ function DashboardLayout() {
             </CardContent>
           </Card>
         </motion.div>
+        <motion.div
+          className="col-span-3 flex w-full items-center justify-between rounded-lg"
+          initial="hidden"
+          animate="visible"
+          variants={cardVariants}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <Card className="w-full">
+            <CardHeader></CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap items-center justify-around gap-4">
+                <div className="flex flex-col items-center">
+                  <p>Total Distance:</p>
+                  <p className="text-2xl">{formattedTotalDistance || 'N/A'}</p>
+                </div>
+                <div className="flex flex-col items-center">
+                  <p>Total Cost:</p>
+                  <p className="text-2xl">
+                    {journeyData?.passengers.reduce((acc, passanger) => acc + parseFloat(passanger.cost), 0) || 0}zł
+                  </p>
+                </div>
+                <div className="flex flex-col items-center">
+                  <p>Total Passengers:</p>
+                  <p className="text-2xl">{passangers.length || 0}</p>
+                </div>
+                <div className="flex flex-col items-center">
+                  <p>Total Locations:</p>
+                  <p className="text-2xl">{locations.length || 0}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         <motion.div
           className="col-span-2 max-h-[500px] overflow-auto"
           initial="hidden"
           animate="visible"
           variants={cardVariants}
-          transition={{ duration: 0.5, delay: 0.1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
         >
           <Card className="h-fit">
             <CardHeader className="flex flex-row justify-between">
@@ -134,6 +177,7 @@ function DashboardLayout() {
                     if (!selectedVehicle) return toast.error('Select a vehicle first');
                     addJourneyMutation.mutate({ locations, vehicle_id: selectedVehicle });
                   }}
+                  disabled={locations.length === 0 || !selectedVehicle || passangers.length === 0}
                 >
                   Calculate Costs
                 </Button>
@@ -164,7 +208,6 @@ function DashboardLayout() {
                     </Button>
                   )}
                 />
-                {formattedTotalDistance}
               </div>
             </CardContent>
           </Card>
@@ -175,7 +218,7 @@ function DashboardLayout() {
           initial="hidden"
           animate="visible"
           variants={cardVariants}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
         >
           <Card className="h-fit">
             <CardHeader>

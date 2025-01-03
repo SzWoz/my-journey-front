@@ -1,5 +1,3 @@
-import { create } from 'domain';
-import { distance } from 'framer-motion';
 import { z } from 'zod';
 
 export const LoginCredientials = z.object({

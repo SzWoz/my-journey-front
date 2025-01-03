@@ -10,7 +10,7 @@ const UserVehicles: React.FC = () => {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Your Vehicles</CardTitle>
+        <CardTitle>My Vehicles</CardTitle>
       </CardHeader>
       <CardContent>
         <GenericTable

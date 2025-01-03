@@ -22,7 +22,9 @@ function Journeys() {
   return (
     <div>
       <h1>Journeys</h1>
-      {journeys?.map(journey => <JourneyAccordion key={journey.id} journey={journey} />)}
+      <div className="grid gap-4">
+        {journeys?.map(journey => <JourneyAccordion key={journey.id} journey={journey} />)}
+      </div>
     </div>
   );
 }
