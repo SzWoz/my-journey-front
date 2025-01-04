@@ -11,6 +11,7 @@ type AutocompleteProps = {
 
 function Autocomplete({ addLocation }: AutocompleteProps) {
   const [placeAutocomplete, setPlaceAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
+  const [isValidLocation, setIsValidLocation] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const places = useMapsLibrary('places');
 
@@ -22,10 +23,12 @@ function Autocomplete({ addLocation }: AutocompleteProps) {
 
     if (lat && lng) {
       addLocation({ data: { lat, lng, formattedAddress } });
+      setIsValidLocation(false); // Reset validation
+      if (inputRef.current) inputRef.current.value = ''; // Clear input field
     } else {
       toast.error('Failed to get location');
     }
-  }, [placeAutocomplete]);
+  }, [placeAutocomplete, addLocation]);
 
   useEffect(() => {
     if (!places || !inputRef.current) return;
@@ -34,13 +37,32 @@ function Autocomplete({ addLocation }: AutocompleteProps) {
       fields: ['geometry', 'name', 'formatted_address'],
     };
 
-    setPlaceAutocomplete(new places.Autocomplete(inputRef.current, options));
+    const autocomplete = new places.Autocomplete(inputRef.current, options);
+    setPlaceAutocomplete(autocomplete);
+
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace();
+      if (place.geometry && place.formatted_address) {
+        setIsValidLocation(true); // Mark as valid location
+      } else {
+        setIsValidLocation(false);
+      }
+    });
+
+    return () => {
+      google.maps.event.clearInstanceListeners(autocomplete);
+    };
   }, [places]);
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <Input ref={inputRef} />
-      <Button onClick={() => handleLocationSelection()}>Select Location</Button>
+    <div className="flex items-center gap-4">
+      <Input ref={inputRef} placeholder="Search for a location" />
+      <Button
+        onClick={handleLocationSelection}
+        disabled={!isValidLocation} // Disable button until a valid location is selected
+      >
+        Select Location
+      </Button>
     </div>
   );
 }

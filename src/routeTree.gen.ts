@@ -20,7 +20,8 @@ import { Route as AuthAuthRegisterImport } from './routes/auth/_auth.register'
 import { Route as AuthAuthLogoutImport } from './routes/auth/_auth.logout'
 import { Route as AuthAuthLoginImport } from './routes/auth/_auth.login'
 import { Route as AppAuthenticatedDashboardIndexImport } from './routes/_app/_authenticated/dashboard/index'
-import { Route as AppAuthenticatedUserSettingsIndexImport } from './routes/_app/_authenticated/user/settings/index'
+import { Route as AppAuthenticatedUserVehiclesIndexImport } from './routes/_app/_authenticated/user/vehicles/index'
+import { Route as AppAuthenticatedUserJourneysIndexImport } from './routes/_app/_authenticated/user/journeys/index'
 
 // Create Virtual Routes
 
@@ -69,9 +70,15 @@ const AppAuthenticatedDashboardIndexRoute =
     getParentRoute: () => AppAuthenticatedRoute,
   } as any)
 
-const AppAuthenticatedUserSettingsIndexRoute =
-  AppAuthenticatedUserSettingsIndexImport.update({
-    path: '/user/settings/',
+const AppAuthenticatedUserVehiclesIndexRoute =
+  AppAuthenticatedUserVehiclesIndexImport.update({
+    path: '/user/vehicles/',
+    getParentRoute: () => AppAuthenticatedRoute,
+  } as any)
+
+const AppAuthenticatedUserJourneysIndexRoute =
+  AppAuthenticatedUserJourneysIndexImport.update({
+    path: '/user/journeys/',
     getParentRoute: () => AppAuthenticatedRoute,
   } as any)
 
@@ -135,11 +142,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuthenticatedDashboardIndexImport
       parentRoute: typeof AppAuthenticatedImport
     }
-    '/_app/_authenticated/user/settings/': {
-      id: '/_app/_authenticated/user/settings/'
-      path: '/user/settings'
-      fullPath: '/user/settings'
-      preLoaderRoute: typeof AppAuthenticatedUserSettingsIndexImport
+    '/_app/_authenticated/user/journeys/': {
+      id: '/_app/_authenticated/user/journeys/'
+      path: '/user/journeys'
+      fullPath: '/user/journeys'
+      preLoaderRoute: typeof AppAuthenticatedUserJourneysIndexImport
+      parentRoute: typeof AppAuthenticatedImport
+    }
+    '/_app/_authenticated/user/vehicles/': {
+      id: '/_app/_authenticated/user/vehicles/'
+      path: '/user/vehicles'
+      fullPath: '/user/vehicles'
+      preLoaderRoute: typeof AppAuthenticatedUserVehiclesIndexImport
       parentRoute: typeof AppAuthenticatedImport
     }
   }
@@ -149,13 +163,16 @@ declare module '@tanstack/react-router' {
 
 interface AppAuthenticatedRouteChildren {
   AppAuthenticatedDashboardIndexRoute: typeof AppAuthenticatedDashboardIndexRoute
-  AppAuthenticatedUserSettingsIndexRoute: typeof AppAuthenticatedUserSettingsIndexRoute
+  AppAuthenticatedUserJourneysIndexRoute: typeof AppAuthenticatedUserJourneysIndexRoute
+  AppAuthenticatedUserVehiclesIndexRoute: typeof AppAuthenticatedUserVehiclesIndexRoute
 }
 
 const AppAuthenticatedRouteChildren: AppAuthenticatedRouteChildren = {
   AppAuthenticatedDashboardIndexRoute: AppAuthenticatedDashboardIndexRoute,
-  AppAuthenticatedUserSettingsIndexRoute:
-    AppAuthenticatedUserSettingsIndexRoute,
+  AppAuthenticatedUserJourneysIndexRoute:
+    AppAuthenticatedUserJourneysIndexRoute,
+  AppAuthenticatedUserVehiclesIndexRoute:
+    AppAuthenticatedUserVehiclesIndexRoute,
 }
 
 const AppAuthenticatedRouteWithChildren =
@@ -204,7 +221,8 @@ export interface FileRoutesByFullPath {
   '/auth/logout': typeof AuthAuthLogoutRoute
   '/auth/register': typeof AuthAuthRegisterRoute
   '/dashboard': typeof AppAuthenticatedDashboardIndexRoute
-  '/user/settings': typeof AppAuthenticatedUserSettingsIndexRoute
+  '/user/journeys': typeof AppAuthenticatedUserJourneysIndexRoute
+  '/user/vehicles': typeof AppAuthenticatedUserVehiclesIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -214,7 +232,8 @@ export interface FileRoutesByTo {
   '/auth/logout': typeof AuthAuthLogoutRoute
   '/auth/register': typeof AuthAuthRegisterRoute
   '/dashboard': typeof AppAuthenticatedDashboardIndexRoute
-  '/user/settings': typeof AppAuthenticatedUserSettingsIndexRoute
+  '/user/journeys': typeof AppAuthenticatedUserJourneysIndexRoute
+  '/user/vehicles': typeof AppAuthenticatedUserVehiclesIndexRoute
 }
 
 export interface FileRoutesById {
@@ -227,7 +246,8 @@ export interface FileRoutesById {
   '/auth/_auth/logout': typeof AuthAuthLogoutRoute
   '/auth/_auth/register': typeof AuthAuthRegisterRoute
   '/_app/_authenticated/dashboard/': typeof AppAuthenticatedDashboardIndexRoute
-  '/_app/_authenticated/user/settings/': typeof AppAuthenticatedUserSettingsIndexRoute
+  '/_app/_authenticated/user/journeys/': typeof AppAuthenticatedUserJourneysIndexRoute
+  '/_app/_authenticated/user/vehicles/': typeof AppAuthenticatedUserVehiclesIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -239,7 +259,8 @@ export interface FileRouteTypes {
     | '/auth/logout'
     | '/auth/register'
     | '/dashboard'
-    | '/user/settings'
+    | '/user/journeys'
+    | '/user/vehicles'
   fileRoutesByTo: FileRoutesByTo
   to:
     | ''
@@ -248,7 +269,8 @@ export interface FileRouteTypes {
     | '/auth/logout'
     | '/auth/register'
     | '/dashboard'
-    | '/user/settings'
+    | '/user/journeys'
+    | '/user/vehicles'
   id:
     | '__root__'
     | '/_app'
@@ -259,7 +281,8 @@ export interface FileRouteTypes {
     | '/auth/_auth/logout'
     | '/auth/_auth/register'
     | '/_app/_authenticated/dashboard/'
-    | '/_app/_authenticated/user/settings/'
+    | '/_app/_authenticated/user/journeys/'
+    | '/_app/_authenticated/user/vehicles/'
   fileRoutesById: FileRoutesById
 }
 
@@ -300,7 +323,8 @@ export const routeTree = rootRoute
       "parent": "/_app",
       "children": [
         "/_app/_authenticated/dashboard/",
-        "/_app/_authenticated/user/settings/"
+        "/_app/_authenticated/user/journeys/",
+        "/_app/_authenticated/user/vehicles/"
       ]
     },
     "/auth": {
@@ -334,8 +358,12 @@ export const routeTree = rootRoute
       "filePath": "_app/_authenticated/dashboard/index.tsx",
       "parent": "/_app/_authenticated"
     },
-    "/_app/_authenticated/user/settings/": {
-      "filePath": "_app/_authenticated/user/settings/index.tsx",
+    "/_app/_authenticated/user/journeys/": {
+      "filePath": "_app/_authenticated/user/journeys/index.tsx",
+      "parent": "/_app/_authenticated"
+    },
+    "/_app/_authenticated/user/vehicles/": {
+      "filePath": "_app/_authenticated/user/vehicles/index.tsx",
       "parent": "/_app/_authenticated"
     }
   }

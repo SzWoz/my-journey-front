@@ -10,11 +10,11 @@ const UserVehicles: React.FC = () => {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Your Vehicles</CardTitle>
+        <CardTitle>My Vehicles</CardTitle>
       </CardHeader>
       <CardContent>
         <GenericTable
-          headers={['Year', 'Manufacturer', 'Model', 'Version', 'Fuel Type', 'Fuel Efficiency']}
+          headers={['Year', 'Manufacturer', 'Model', 'Version', 'Fuel Type', 'Efficiency (l/100km)']}
           data={vehicleData || []}
           dataAccessors={['year', 'manufacturer', 'model', 'version', 'fuel_type', 'fuel_efficiency']}
           renderCell={(item, accessor) => String(item[accessor])}

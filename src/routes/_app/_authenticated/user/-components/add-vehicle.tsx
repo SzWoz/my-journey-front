@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { fetchYears, fetchMakes, fetchModels, fetchOptions, fetchVehicleData } from '@/api/vehicleApi';
-import { VehicleMenuItem } from '@/api/schema';
+import { Vehicle, VehicleMenuItem } from '@/api/schema';
 import { Combobox } from '@/components/ui/combobox';
 import { toast } from 'sonner';
-import ky from '@/api/utils/ky';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { vehiclesQueryOptions } from '@/queries/vehicles';
+import { addVehicle } from '@/api/vehicles';
 
 const AddVehicle: React.FC = () => {
   const [years, setYears] = useState<VehicleMenuItem[]>([]);
@@ -28,6 +30,20 @@ const AddVehicle: React.FC = () => {
 
   const [showInput, setShowInput] = useState<boolean>(false);
   const [efficiency, setEfficiency] = useState<number | null>(null);
+
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: addVehicle,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: vehiclesQueryOptions.queryKey });
+      toast.success('Vehicle added successfully');
+      clearFields();
+    },
+    onError: () => {
+      toast.error('Error adding vehicle');
+    },
+  });
 
   useEffect(() => {
     const loadYears = async () => {
@@ -125,30 +141,17 @@ const AddVehicle: React.FC = () => {
     if (selectedVersion) fetchVehicleDataFromApi();
   }, [selectedVersion]);
 
-  const handleAddVehicle = async () => {
-    try {
-      const response = await ky.post('vehicles', {
-        json: {
-          year: selectedYear,
-          manufacturer: selectedMake,
-          model: selectedModel,
-          version: options.find(version => version.value === selectedVersion)?.text,
-          fuel_type: selectedFuelType,
-          fuel_efficiency: efficiency?.toFixed(2),
-        },
-      });
+  const handleAddVehicle = () => {
+    const vehicle = {
+      year: Number(selectedYear),
+      manufacturer: selectedMake,
+      model: selectedModel,
+      version: options.find(version => version.value === selectedVersion)?.text,
+      fuel_type: selectedFuelType,
+      fuel_efficiency: efficiency?.toFixed(2),
+    } as Omit<Vehicle, 'id'>;
 
-      if (!response.ok) {
-        throw new Error('Failed to add vehicle');
-      }
-
-      clearFields();
-
-      toast.success('Vehicle added successfully');
-    } catch (error) {
-      console.log(error);
-      toast.error('Error adding vehicle');
-    }
+    mutation.mutate(vehicle);
   };
 
   const clearFields = () => {
@@ -270,7 +273,7 @@ const AddVehicle: React.FC = () => {
           </div>
         )}
 
-        <Button className="bg-teal-500" onClick={handleAddVehicle} disabled={!selectedVersion}>
+        <Button onClick={handleAddVehicle} disabled={!selectedVersion}>
           Add Vehicle
         </Button>
       </CardContent>

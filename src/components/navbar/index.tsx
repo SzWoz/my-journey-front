@@ -18,7 +18,9 @@ function Navbar() {
   const navigate = useNavigate();
   return (
     <nav className="flex h-10 items-center justify-between p-8">
-      <h1>My Journey</h1>
+      <Button className="cursor-pointer" onClick={() => navigate({ to: '/dashboard' })}>
+        My Journey
+      </Button>
       <div className="flex items-center space-x-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -31,8 +33,18 @@ function Navbar() {
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => navigate({ to: '/user/settings' })}>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer" onClick={() => navigate({ to: '/user/vehicles' })}>
+                My Vehicles
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer" onClick={() => navigate({ to: '/user/journeys' })}>
+                My Journeys
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem className="cursor-pointer" onClick={() => navigate({ to: '/auth/logout' })}>
+                Log Out
+              </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>

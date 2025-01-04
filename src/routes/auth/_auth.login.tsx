@@ -4,6 +4,7 @@ import { storeToken } from '@/api/utils/token';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useMutation } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
@@ -30,7 +31,6 @@ function LoginLayout() {
       setIsAuthenticated(true);
       storeToken(token);
       setError(null);
-
       navigate({ to: '/dashboard' });
     },
     onError: err => {
@@ -51,53 +51,56 @@ function LoginLayout() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-sm rounded bg-white p-6 shadow-md">
-        <div className="mb-4 flex justify-evenly">
-          <button
-            className="border-b-2 border-violet-500 text-violet-500"
-            onClick={() => navigate({ to: '/auth/login' })}
-          >
-            Login
-          </button>
-          <button className="text-violet-500" onClick={() => navigate({ to: '/auth/register' })}>
-            Register
-          </button>
-        </div>
-        <form onSubmit={handleSubmit}>
-          <h1 className="mb-4 text-2xl font-bold">Login</h1>
-          <div className="mb-4">
-            <Label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="email"
-              value={formState.email}
-              onChange={e => setFormState({ ...formState, email: e.target.value })}
-              className="mt-1 block w-full"
-            />
+    <div className="flex min-h-screen items-center justify-center">
+      <Card className="w-full max-w-sm text-neutral-200 shadow-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">Login</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-4 flex justify-evenly">
+            <button className="border-b-2 border-white text-white" onClick={() => navigate({ to: '/auth/login' })}>
+              Login
+            </button>
+            <button className="text-neutral-400 hover:text-gray-200" onClick={() => navigate({ to: '/auth/register' })}>
+              Register
+            </button>
           </div>
-          <div className="mb-4">
-            <Label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Password
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="password"
-              value={formState.password}
-              onChange={e => setFormState({ ...formState, password: e.target.value })}
-              className="mt-1 block w-full"
-            />
-          </div>
-          {error && <p className="mt-1 text-red-500">{error}</p>}
-          <Button type="submit" className="mt-1 w-full">
-            Login
-          </Button>
-        </form>
-      </div>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <Label htmlFor="email" className="block text-sm font-medium text-neutral-300">
+                Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Email"
+                value={formState.email}
+                onChange={e => setFormState({ ...formState, email: e.target.value })}
+                className="mt-1 block w-full text-neutral-200"
+              />
+            </div>
+            <div className="mb-4">
+              <Label htmlFor="password" className="block text-sm font-medium text-neutral-300">
+                Password
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Password"
+                value={formState.password}
+                onChange={e => setFormState({ ...formState, password: e.target.value })}
+                className="mt-1 block w-full text-neutral-200"
+              />
+            </div>
+            {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+            <Button type="submit" className="mt-1 w-full">
+              Login
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }
+
+export default LoginLayout;
